@@ -10,7 +10,6 @@
     
     <style>
         :root {
-            
             --md-sys-color-primary: #6750A4;
             --md-sys-color-on-primary: #FFFFFF;
             --md-sys-color-primary-container: #EADDFF;
@@ -29,6 +28,11 @@
             --md-shape-corner-large: 16px;
             --md-shape-corner-medium: 12px;
             --md-shape-corner-full: 100px;
+            
+            --glass-bg: rgba(255, 255, 255, 0.16);
+            --glass-border: rgba(255, 255, 255, 0.42);
+            --glass-shadow: 0 10px 40px rgba(0,0,0,.08), inset 0 2px 10px rgba(255,255,255,.4);
+            --glass-blur: 30px;
         }
 
         * {
@@ -40,7 +44,12 @@
         }
 
         body {
-            background-color: var(--md-sys-color-background);
+            background:
+                radial-gradient(circle at 20% 20%, #6ea8ff 0%, transparent 35%),
+                radial-gradient(circle at 80% 30%, #ff9bd7 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, #7df9ff 0%, transparent 35%),
+                linear-gradient(135deg,#eef4ff,#f8f4ff,#edfaff) !important;
+            background-attachment: fixed;
             color: var(--md-sys-color-on-surface);
             display: flex;
             height: 100vh;
@@ -55,11 +64,31 @@
 
         .sidebar {
             width: 320px;
-            background-color: var(--md-sys-color-surface);
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
             padding: 24px 12px;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid var(--md-sys-color-surface-variant);
+            border-right: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0));
+            filter: blur(18px);
+            left: var(--blob-x, 50px);
+            top: var(--blob-y, 50px);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: left .12s linear, top .12s linear;
         }
 
         .sidebar-header {
@@ -82,7 +111,6 @@
             gap: 4px;
             padding-right: 4px;
         }
-
         .nav-scroll::-webkit-scrollbar { width: 4px; }
         .nav-scroll::-webkit-scrollbar-thumb {
             background: var(--md-sys-color-surface-variant);
@@ -113,18 +141,34 @@
             cursor: pointer;
             border-radius: var(--md-shape-corner-full);
             transition: all 0.2s ease-in-out;
+            position: relative;
+            overflow: hidden;
         }
 
         .nav-button:hover {
-            background-color: var(--md-sys-color-surface-variant);
+            background: rgba(255,255,255,.22) !important;
+            backdrop-filter: blur(18px);
+            transform: translateX(4px);
             color: var(--md-sys-color-on-surface);
         }
 
         .nav-button.active {
-            background-color: var(--md-sys-color-primary-container);
+            background: rgba(255,255,255,.35) !important;
+            backdrop-filter: blur(22px);
+            box-shadow: 0 4px 20px rgba(0,0,0,.06);
             color: var(--md-sys-color-on-primary-container);
         }
 
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle, rgba(255,255,255,.45), transparent 65%);
+            opacity: 0;
+            transition: .35s;
+            pointer-events: none;
+        }
+        .nav-button:hover::after { opacity: 1; }
         .nav-button .material-symbols-outlined { font-size: 20px; }
 
         .main-content {
@@ -133,59 +177,93 @@
             overflow-y: auto;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
         }
 
         .page {
             display: none;
             width: 100%;
-            max-width: 660px;
+            max-width: 1000px;
             animation: M3FadeIn 0.4s cubic-bezier(0.2, 0, 0, 1);
         }
 
         .page.active { display: block; }
 
         @keyframes M3FadeIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(20px) scale(.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .card {
-            background-color: var(--md-sys-color-surface);
+            background: linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.12)) !important;
+            backdrop-filter: blur(35px) saturate(180%);
+            -webkit-backdrop-filter: blur(35px) saturate(180%);
+            border: 1px solid rgba(255,255,255,.4) !important;
+            box-shadow: 0 12px 60px rgba(0,0,0,.08), inset 0 1px 1px rgba(255,255,255,.7) !important;
             padding: 36px;
-            border-radius: var(--md-shape-corner-extra-large);
-            box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.02);
-            border: 1px solid var(--md-sys-color-surface-variant);
+            border-radius: 36px !important;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 32px;
+            align-items: stretch;
+            will-change: transform, backdrop-filter;
+        }
+
+        .card:hover {
+            box-shadow: 0 20px 80px rgba(0,0,0,.10), inset 0 1px 1px rgba(255,255,255,.8);
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));
+            opacity: .65;
+        }
+
+        .panel-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .card h2 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             color: var(--md-sys-color-on-surface);
             margin-bottom: 4px;
         }
 
         .card p.description {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--md-sys-color-on-surface-variant);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             line-height: 1.5;
         }
 
         .formula-box {
             background-color: var(--md-sys-color-tertiary-container);
             color: var(--md-sys-color-on-tertiary-container);
-            padding: 16px 20px;
-            border-radius: var(--md-shape-corner-large);
-            margin-bottom: 28px;
+            padding: 14px 18px;
+            border-radius: var(--md-shape-corner-large) var(--md-shape-corner-large) 0 0;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             border-left: 5px solid #7D5260;
+            margin-bottom: 0px;
         }
 
         .formula-box span.title {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 1px;
@@ -194,60 +272,110 @@
 
         .formula-box p.equation {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
+        }
+
+        .inputs-container {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 var(--md-shape-corner-large) var(--md-shape-corner-large);
+            border: 1px solid rgba(255,255,255,.3);
+            border-top: none;
+            padding: 20px;
+            gap: 16px;
         }
 
         .inputs-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 16px;
-            margin-bottom: 24px;
+            width: 100%;
         }
 
         .input-group {
             position: relative;
-            margin-bottom: 24px;
+            width: 100%;
         }
-        .inputs-grid .input-group { margin-bottom: 0; }
 
         .text-input {
             width: 100%;
-            padding: 16px 20px;
+            padding: 22px 18px 12px 18px !important;
             font-size: 16px;
-            border: 2px solid var(--md-sys-color-outline);
+            border: 1px solid rgba(255,255,255,.35) !important;
             border-radius: var(--md-shape-corner-large);
-            background: transparent;
+            background: rgba(255,255,255,.18) !important;
+            backdrop-filter: blur(20px);
             color: var(--md-sys-color-on-surface);
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+            will-change: transform;
         }
 
         .text-input:focus {
-            border-color: var(--md-sys-color-primary);
-            box-shadow: 0 0 0 1px var(--md-sys-color-primary);
+            transform: translateY(-2px);
+            border-color: #5a8cff !important;
+            box-shadow: 0 0 0 4px rgba(90,140,255,.15), 0 10px 30px rgba(90,140,255,.12) !important;
         }
 
         .input-label {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: -10px;
-            background-color: var(--md-sys-color-surface);
-            padding: 0 8px;
-            font-size: 12px;
+            padding: 2px 10px !important;
+            font-size: 11px;
             font-weight: 600;
             color: var(--md-sys-color-primary);
+            z-index: 5;
+            border-radius: 999px;
+            backdrop-filter: blur(20px);
+            background: rgba(255,255,255,.85) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+        }
+
+        .preview-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: var(--md-shape-corner-large);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            min-height: 220px;
+            overflow: hidden;
+        }
+
+        .preview-label {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--md-sys-color-primary);
+            z-index: 2;
+            opacity: 0.8;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
         .result-container {
-            margin-top: 28px;
-            padding: 24px;
-            background-color: var(--md-sys-color-primary-container);
+            padding: 18px 24px;
+            background: rgba(255,255,255,.22) !important;
+            backdrop-filter: blur(28px);
+            border: 1px solid rgba(255,255,255,.4);
             border-radius: var(--md-shape-corner-large);
             color: var(--md-sys-color-on-primary-container);
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 10px;
+            will-change: transform, backdrop-filter;
         }
 
         .result-item {
@@ -257,170 +385,27 @@
         }
 
         .result-divider {
-            border-top: 1px solid rgba(103, 80, 164, 0.12);
-            padding-top: 14px;
+            border-top: 1px solid rgba(103, 80, 164, 0.1);
+            padding-top: 10px;
         }
 
         .result-label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
         .result-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
         }
 
-:root{
---glass-bg: rgba(255,255,255,.16);
---glass-border: rgba(255,255,255,.42);
---glass-shadow: 0 10px 40px rgba(0,0,0,.08), inset 0 2px 10px rgba(255,255,255,.4);
---glass-blur: 30px;
-}
-
-body{
-background:
-radial-gradient(circle at 20% 20%, #6ea8ff 0%, transparent 35%),
-radial-gradient(circle at 80% 30%, #ff9bd7 0%, transparent 40%),
-radial-gradient(circle at 50% 80%, #7df9ff 0%, transparent 35%),
-linear-gradient(135deg,#eef4ff,#f8f4ff,#edfaff) !important;
-background-attachment: fixed;
-}
-
-.sidebar{
-background:var(--glass-bg)!important;
-backdrop-filter:blur(var(--glass-blur)) saturate(180%);
--webkit-backdrop-filter:blur(var(--glass-blur)) saturate(180%);
-border-right:1px solid var(--glass-border)!important;
-box-shadow:var(--glass-shadow);
-}
-
-.card{
-background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.12)) !important;
-backdrop-filter:blur(35px) saturate(180%);
--webkit-backdrop-filter:blur(35px) saturate(180%);
-border:1px solid rgba(255,255,255,.4)!important;
-box-shadow:0 12px 60px rgba(0,0,0,.08), inset 0 1px 1px rgba(255,255,255,.7)!important;
-border-radius:36px!important;
-position:relative;
-overflow:hidden;
-}
-
-.card::before{
-content:"";
-position:absolute;
-inset:0;
-pointer-events:none;
-background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));
-opacity:.65;
-}
-
-.text-input{
-background:rgba(255,255,255,.18)!important;
-backdrop-filter:blur(20px);
-border:1px solid rgba(255,255,255,.35)!important;
-}
-
-.text-input:focus{
-transform:translateY(-2px);
-border-color:#5a8cff!important;
-box-shadow:0 0 0 4px rgba(90,140,255,.15),0 10px 30px rgba(90,140,255,.12)!important;
-}
-
-.nav-button:hover{
-background:rgba(255,255,255,.22)!important;
-backdrop-filter:blur(18px);
-transform:translateX(4px);
-}
-
-.nav-button.active{
-background:rgba(255,255,255,.35)!important;
-backdrop-filter:blur(22px);
-box-shadow:0 4px 20px rgba(0,0,0,.06);
-}
-
-.result-container{
-background:rgba(255,255,255,.22)!important;
-backdrop-filter:blur(28px);
-border:1px solid rgba(255,255,255,.4);
-}
-
-@keyframes M3FadeIn{
-from{opacity:0;transform:translateY(20px) scale(.97);}
-to{opacity:1;transform:translateY(0) scale(1);}
-}
-
-.sidebar,.card,.result-container,.text-input,.nav-button{
-will-change:transform,backdrop-filter;
-}
-
-.sidebar{
-position:relative;
-overflow:hidden;
-}
-
-.sidebar::before{
-content:'';
-position:absolute;
-width:180px;
-height:180px;
-border-radius:50%;
-background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,0));
-filter:blur(18px);
-left:var(--blob-x,50px);
-top:var(--blob-y,50px);
-transform:translate(-50%,-50%);
-pointer-events:none;
-transition:left .12s linear, top .12s linear;
-}
-
-.nav-button{
-position:relative;
-overflow:hidden;
-}
-
-.nav-button::after{
-content:'';
-position:absolute;
-inset:-40%;
-background:radial-gradient(circle,rgba(255,255,255,.45),transparent 65%);
-opacity:0;
-transition:.35s;
-pointer-events:none;
-}
-
-.nav-button:hover::after{
-opacity:1;
-}
-
-.input-label{
-z-index:5;
-border-radius:999px;
-padding:4px 10px !important;
-backdrop-filter:blur(20px);
-background:rgba(255,255,255,.75)!important;
-box-shadow:0 2px 10px rgba(0,0,0,.05);
-}
-
-.text-input{
-padding-top:22px !important;
-padding-bottom:14px !important;
-}
-
-.card{
-transform-style:preserve-3d;
-}
-
-.card:hover{
-box-shadow:
-0 20px 80px rgba(0,0,0,.10),
-inset 0 1px 1px rgba(255,255,255,.8);
-}
-
-</style>
+        .sidebar, .card, .result-container, .text-input, .nav-button {
+            will-change: transform, backdrop-filter;
+        }
+    </style>
 </head>
 <body>
 
@@ -480,6 +465,12 @@ inset 0 1px 1px rgba(255,255,255,.8);
                 <button class="nav-button" onclick="switchTab('tab-cone')">
                     <span class="material-symbols-outlined">navigation</span>Cone
                 </button>
+                <button class="nav-button" onclick="switchTab('tab-pyramid')">
+                    <span class="material-symbols-outlined">change_history</span>Triangular Pyramid
+                </button>
+                <button class="nav-button" onclick="switchTab('tab-torus')">
+                    <span class="material-symbols-outlined">toll</span>Torus (Donut)
+                </button>
             </div>
         </aside>
 
@@ -487,342 +478,560 @@ inset 0 1px 1px rgba(255,255,255,.8);
             
             <div id="tab-radius" class="page active">
                 <div class="card">
-                    <h2>Radius Converter</h2>
-                    <p class="description">Calculate circumference and surface area directly using a circle's core radius.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Circumference (C) = 2 · π · r</p>
-                        <p class="equation">Area (A) = π · r²</p>
+                    <div class="panel-left">
+                        <h2>Radius Converter</h2>
+                        <p class="description">Calculate circumference and surface area directly using a circle's core radius.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Circumference (C) = 2 · π · r</p>
+                            <p class="equation">Area (A) = π · r²</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Radius (r)</label>
+                                <input type="number" id="input-radius" class="text-input" placeholder="Enter radius..." oninput="calcRadius()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Radius (r)</label>
-                        <input type="number" id="input-radius" class="text-input" placeholder="Enter radius..." oninput="calcRadius()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Circumference (C)</span><span id="res-c-from-r" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Area (A)</span><span id="res-a-from-r" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-radius"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Circumference (C)</span><span id="res-c-from-r" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Area (A)</span><span id="res-a-from-r" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-diameter" class="page">
                 <div class="card">
-                    <h2>Diameter Converter</h2>
-                    <p class="description">Evaluate circle bounding properties by typing its width edge-to-edge (Diameter).</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Circumference (C) = π · d</p>
-                        <p class="equation">Area (A) = π · (d / 2)²</p>
+                    <div class="panel-left">
+                        <h2>Diameter Converter</h2>
+                        <p class="description">Evaluate circle bounding properties by typing its width edge-to-edge.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Circumference (C) = π · d</p>
+                            <p class="equation">Area (A) = π · (d / 2)²</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Diameter (d)</label>
+                                <input type="number" id="input-diameter" class="text-input" placeholder="Enter diameter..." oninput="calcDiameter()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Diameter (d)</label>
-                        <input type="number" id="input-diameter" class="text-input" placeholder="Enter diameter..." oninput="calcDiameter()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Circumference (C)</span><span id="res-c-from-d" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Area (A)</span><span id="res-a-from-d" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-diameter"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Circumference (C)</span><span id="res-c-from-d" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Area (A)</span><span id="res-a-from-d" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-inverse" class="page">
                 <div class="card">
-                    <h2>Circumference Decoder</h2>
-                    <p class="description">Decode a total length loop (circumference) backwards to uncover basic metrics.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Diameter (d) = C / π</p>
-                        <p class="equation">Radius (r) = C / (2 · π)</p>
-                        <p class="equation">Area (A) = π · r²</p>
+                    <div class="panel-left">
+                        <h2>Circumference Decoder</h2>
+                        <p class="description">Decode a total length loop backwards to uncover basic metrics.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Diameter (d) = C / π | Radius (r) = C / (2 · π)</p>
+                            <p class="equation">Area (A) = π · r²</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Circumference (C)</label>
+                                <input type="number" id="input-circumference" class="text-input" placeholder="Enter circumference..." oninput="calcInverse()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Circumference (C)</label>
-                        <input type="number" id="input-circumference" class="text-input" placeholder="Enter circumference..." oninput="calcInverse()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Diameter (d)</span><span id="res-d-from-c" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Radius (r)</span><span id="res-r-from-c" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Area (A)</span><span id="res-a-from-c" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-inverse"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Diameter (d)</span><span id="res-d-from-c" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Radius (r)</span><span id="res-r-from-c" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Area (A)</span><span id="res-a-from-c" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-area-decoder" class="page">
                 <div class="card">
-                    <h2>Circle Area Decoder</h2>
-                    <p class="description">Input a flat area measurement to isolate the core radius, diameter, and boundary loop.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Radius (r) = √(A / π)</p>
-                        <p class="equation">Diameter (d) = 2 · r</p>
-                        <p class="equation">Circumference (C) = 2 · π · r</p>
+                    <div class="panel-left">
+                        <h2>Circle Area Decoder</h2>
+                        <p class="description">Input a flat area measurement to isolate the core metrics.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Radius (r) = √(A / π) | Diameter (d) = 2 · r</p>
+                            <p class="equation">Circumference (C) = 2 · π · r</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Area (A)</label>
+                                <input type="number" id="input-area-decode" class="text-input" placeholder="Enter circle area..." oninput="calcAreaDecoder()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Area (A)</label>
-                        <input type="number" id="input-area-decode" class="text-input" placeholder="Enter circle flat area..." oninput="calcAreaDecoder()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Radius (r)</span><span id="res-r-from-a" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Diameter (d)</span><span id="res-d-from-a" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Circumference (C)</span><span id="res-c-from-a" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-area-decoder"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Radius (r)</span><span id="res-r-from-a" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Diameter (d)</span><span id="res-d-from-a" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Circumference (C)</span><span id="res-c-from-a" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-square" class="page">
                 <div class="card">
-                    <h2>Square Metrics</h2>
-                    <p class="description">Calculate the total 2D size space and bounding fence path for equal-side blocks.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Area (A) = s²</p>
-                        <p class="equation">Perimeter (P) = 4 · s</p>
+                    <div class="panel-left">
+                        <h2>Square Metrics</h2>
+                        <p class="description">Calculate the total 2D size space and bounding fence path.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Area (A) = s²</p>
+                            <p class="equation">Perimeter (P) = 4 · s</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Side Length (s)</label>
+                                <input type="number" id="input-square-s" class="text-input" placeholder="Enter side length..." oninput="calcSquare()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Side Length (s)</label>
-                        <input type="number" id="input-square-s" class="text-input" placeholder="Enter side length..." oninput="calcSquare()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Area (A)</span><span id="res-square-a" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Perimeter (P)</span><span id="res-square-p" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-square"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Area (A)</span><span id="res-square-a" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Perimeter (P)</span><span id="res-square-p" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-rectangle" class="page">
                 <div class="card">
-                    <h2>Rectangle Metrics</h2>
-                    <p class="description">Provide dual perpendicular axis values to calculate boundary tracks and surface zones.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Area (A) = l · w</p>
-                        <p class="equation">Perimeter (P) = 2 · (l + w)</p>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group">
-                            <label class="input-label">Length (l)</label>
-                            <input type="number" id="input-rect-l" class="text-input" placeholder="Length..." oninput="calcRectangle()">
+                    <div class="panel-left">
+                        <h2>Rectangle Metrics</h2>
+                        <p class="description">Provide dual perpendicular axis values to view dynamic proportions.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Area (A) = l · w</p>
+                            <p class="equation">Perimeter (P) = 2 · (l + w)</p>
                         </div>
-                        <div class="input-group">
-                            <label class="input-label">Width (w)</label>
-                            <input type="number" id="input-rect-w" class="text-input" placeholder="Width..." oninput="calcRectangle()">
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Length (l)</label>
+                                    <input type="number" id="input-rect-l" class="text-input" placeholder="Length..." oninput="calcRectangle()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Width (w)</label>
+                                    <input type="number" id="input-rect-w" class="text-input" placeholder="Width..." oninput="calcRectangle()">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Area (A)</span><span id="res-rect-a" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Perimeter (P)</span><span id="res-rect-p" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-rectangle"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Area (A)</span><span id="res-rect-a" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Perimeter (P)</span><span id="res-rect-p" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-triangle" class="page">
                 <div class="card">
-                    <h2>Triangle Area</h2>
-                    <p class="description">Enter structural base limits and vertical drop lines to compute spatial interior areas.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formula</span>
-                        <p class="equation">Area (A) = 0.5 · b · h</p>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group">
-                            <label class="input-label">Base (b)</label>
-                            <input type="number" id="input-tri-b" class="text-input" placeholder="Base..." oninput="calcTriangle()">
+                    <div class="panel-left">
+                        <h2>Triangle Area</h2>
+                        <p class="description">Enter structural base limits and vertical drop heights.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formula</span>
+                            <p class="equation">Area (A) = 0.5 · b · h</p>
                         </div>
-                        <div class="input-group">
-                            <label class="input-label">Height (h)</label>
-                            <input type="number" id="input-tri-h" class="text-input" placeholder="Height..." oninput="calcTriangle()">
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Base (b)</label>
+                                    <input type="number" id="input-tri-b" class="text-input" placeholder="Base..." oninput="calcTriangle()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height (h)</label>
+                                    <input type="number" id="input-tri-h" class="text-input" placeholder="Height..." oninput="calcTriangle()">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Area (A)</span><span id="res-tri-a" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-triangle"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Area (A)</span><span id="res-tri-a" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-parallelogram" class="page">
                 <div class="card">
-                    <h2>Parallelogram Area</h2>
-                    <p class="description">Evaluate slanted flat squares by calculating base spreads and straight vertical heights.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formula</span>
-                        <p class="equation">Area (A) = b · h</p>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group">
-                            <label class="input-label">Base (b)</label>
-                            <input type="number" id="input-para-b" class="text-input" placeholder="Base..." oninput="calcParallelogram()">
+                    <div class="panel-left">
+                        <h2>Parallelogram Area</h2>
+                        <p class="description">Evaluate slanted flat squares by calculating heights.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formula</span>
+                            <p class="equation">Area (A) = b · h</p>
                         </div>
-                        <div class="input-group">
-                            <label class="input-label">Height (h)</label>
-                            <input type="number" id="input-para-h" class="text-input" placeholder="Height..." oninput="calcParallelogram()">
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Base (b)</label>
+                                    <input type="number" id="input-para-b" class="text-input" placeholder="Base..." oninput="calcParallelogram()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height (h)</label>
+                                    <input type="number" id="input-para-h" class="text-input" placeholder="Height..." oninput="calcParallelogram()">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Area (A)</span><span id="res-para-a" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-parallelogram"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Area (A)</span><span id="res-para-a" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-trapezoid" class="page">
                 <div class="card">
-                    <h2>Trapezoid Area</h2>
-                    <p class="description">Compute total space trapped within dual parallel bases and an independent distance height gap.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formula</span>
-                        <p class="equation">Area (A) = [ (a + b) · h ] / 2</p>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group">
-                            <label class="input-label">Top Base (a)</label>
-                            <input type="number" id="input-trap-a" class="text-input" placeholder="Top base..." oninput="calcTrapezoid()">
+                    <div class="panel-left">
+                        <h2>Trapezoid Area</h2>
+                        <p class="description">Compute space bounded within dual parallel base offsets.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formula</span>
+                            <p class="equation">Area (A) = [ (a + b) · h ] / 2</p>
                         </div>
-                        <div class="input-group">
-                            <label class="input-label">Bottom Base (b)</label>
-                            <input type="number" id="input-trap-b" class="text-input" placeholder="Bottom base..." oninput="calcTrapezoid()">
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Top Base (a)</label>
+                                    <input type="number" id="input-trap-a" class="text-input" placeholder="Top..." oninput="calcTrapezoid()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Bottom Base (b)</label>
+                                    <input type="number" id="input-trap-b" class="text-input" placeholder="Bottom..." oninput="calcTrapezoid()">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Height (h)</label>
+                                <input type="number" id="input-trap-h" class="text-input" placeholder="Height..." oninput="calcTrapezoid()">
+                            </div>
                         </div>
                     </div>
-                    <div class="input-group" style="margin-top: 16px;">
-                        <label class="input-label">Height (h)</label>
-                        <input type="number" id="input-trap-h" class="text-input" placeholder="Vertical height..." oninput="calcTrapezoid()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Area (A)</span><span id="res-trap-a" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-trapezoid"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Area (A)</span><span id="res-trap-a" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-hexagon" class="page">
                 <div class="card">
-                    <h2>Regular Hexagon Metrics</h2>
-                    <p class="description">Evaluate a 6-sided symmetrical polygon matching identical edge paths.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Area (A) = (3 · √3 / 2) · s² ≈ 2.5981 · s²</p>
-                        <p class="equation">Perimeter (P) = 6 · s</p>
+                    <div class="panel-left">
+                        <h2>Regular Hexagon Metrics</h2>
+                        <p class="description">Evaluate a 6-sided polygon matching identical paths.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Area (A) = (3 · √3 / 2) · s²</p>
+                            <p class="equation">Perimeter (P) = 6 · s</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Side Length (s)</label>
+                                <input type="number" id="input-hex-s" class="text-input" placeholder="Enter side length..." oninput="calcHexagon()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Side Length (s)</label>
-                        <input type="number" id="input-hex-s" class="text-input" placeholder="Enter side length..." oninput="calcHexagon()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Area (A)</span><span id="res-hex-a" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Perimeter (P)</span><span id="res-hex-p" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-hexagon"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Area (A)</span><span id="res-hex-a" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Perimeter (P)</span><span id="res-hex-p" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-ellipse" class="page">
                 <div class="card">
-                    <h2>Ellipse Area</h2>
-                    <p class="description">Calculate the flat space enclosed by an elongated symmetric oval plane.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formula</span>
-                        <p class="equation">Area (A) = π · a · b</p>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group">
-                            <label class="input-label">Semi-major Axis (a)</label>
-                            <input type="number" id="input-ellipse-a" class="text-input" placeholder="Long radius radius..." oninput="calcEllipse()">
+                    <div class="panel-left">
+                        <h2>Ellipse Area</h2>
+                        <p class="description">Calculate space enclosed by an asymmetric oval axis plane.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formula</span>
+                            <p class="equation">Area (A) = π · a · b</p>
                         </div>
-                        <div class="input-group">
-                            <label class="input-label">Semi-minor Axis (b)</label>
-                            <input type="number" id="input-ellipse-b" class="text-input" placeholder="Short radius radius..." oninput="calcEllipse()">
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Semi-major (a)</label>
+                                    <input type="number" id="input-ellipse-a" class="text-input" placeholder="Long..." oninput="calcEllipse()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Semi-minor (b)</label>
+                                    <input type="number" id="input-ellipse-b" class="text-input" placeholder="Short..." oninput="calcEllipse()">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Area (A)</span><span id="res-ellipse-a" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-ellipse"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Area (A)</span><span id="res-ellipse-a" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-cube" class="page">
                 <div class="card">
-                    <h2>Cube Solid Metrics</h2>
-                    <p class="description">Measure volumetric solid content spaces and full exterior skin area maps for uniform 3D blocks.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Volume (V) = s³</p>
-                        <p class="equation">Surface Area (SA) = 6 · s²</p>
+                    <div class="panel-left">
+                        <h2>Cube Solid Metrics</h2>
+                        <p class="description">Measure content spaces and skin areas for 3D blocks.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Volume (V) = s³ | Surface Area (SA) = 6 · s²</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Side Length (s)</label>
+                                <input type="number" id="input-cube-s" class="text-input" placeholder="Enter side length..." oninput="calcCube()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Side Length (s)</label>
-                        <input type="number" id="input-cube-s" class="text-input" placeholder="Enter edge dimension..." oninput="calcCube()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-cube-v" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-cube-sa" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-cube"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-cube-v" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-cube-sa" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-sphere" class="page">
                 <div class="card">
-                    <h2>Sphere Solid Metrics</h2>
-                    <p class="description">Evaluate perfect 3D round ball configurations using a central radius anchor line.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Volume (V) = (4/3) · π · r³</p>
-                        <p class="equation">Surface Area (SA) = 4 · π · r²</p>
+                    <div class="panel-left">
+                        <h2>Sphere Solid Metrics</h2>
+                        <p class="description">Evaluate ball loops anchored by a central line.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Volume (V) = (4/3) · π · r³ | Surface Area (SA) = 4 · π · r²</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label class="input-label">Radius (r)</label>
+                                <input type="number" id="input-sphere-r" class="text-input" placeholder="Enter radius..." oninput="calcSphere()">
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Radius (r)</label>
-                        <input type="number" id="input-sphere-r" class="text-input" placeholder="Enter core radius..." oninput="calcSphere()">
-                    </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-sphere-v" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-sphere-sa" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-sphere"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-sphere-v" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-sphere-sa" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-cylinder" class="page">
                 <div class="card">
-                    <h2>Cylinder Solid Metrics</h2>
-                    <p class="description">Resolve parameters inside pipe/can profiles holding twin base discs linked over vertical spaces.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Volume (V) = π · r² · h</p>
-                        <p class="equation">Surface Area (SA) = 2·π·r·h + 2·π·r²</p>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group">
-                            <label class="input-label">Base Radius (r)</label>
-                            <input type="number" id="input-cyl-r" class="text-input" placeholder="Radius..." oninput="calcCylinder()">
+                    <div class="panel-left">
+                        <h2>Cylinder Solid Metrics</h2>
+                        <p class="description">Resolve pipe layouts holding twin disk bases.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Volume (V) = π · r² · h</p>
+                            <p class="equation">Surface Area (SA) = 2·π·r·h + 2·π·r²</p>
                         </div>
-                        <div class="input-group">
-                            <label class="input-label">Height (h)</label>
-                            <input type="number" id="input-cyl-h" class="text-input" placeholder="Height..." oninput="calcCylinder()">
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Base Radius (r)</label>
+                                    <input type="number" id="input-cyl-r" class="text-input" placeholder="Radius..." oninput="calcCylinder()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height (h)</label>
+                                    <input type="number" id="input-cyl-h" class="text-input" placeholder="Height..." oninput="calcCylinder()">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-cyl-v" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-cyl-sa" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-cylinder"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-cyl-v" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-cyl-sa" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-cone" class="page">
                 <div class="card">
-                    <h2>Cone Solid Metrics</h2>
-                    <p class="description">Determine metrics for standard funnels narrowing down from circle bases to single crisp points.</p>
-                    <div class="formula-box">
-                        <span class="title">Learning Formulas</span>
-                        <p class="equation">Volume (V) = (1/3) · π · r² · h</p>
-                        <p class="equation">Surface Area (SA) = π · r · (r + √(h² + r²))</p>
-                    </div>
-                    <div class="inputs-grid">
-                        <div class="input-group">
-                            <label class="input-label">Base Radius (r)</label>
-                            <input type="number" id="input-cone-r" class="text-input" placeholder="Radius..." oninput="calcCone()">
+                    <div class="panel-left">
+                        <h2>Cone Solid Metrics</h2>
+                        <p class="description">Determine standard cone spreads tapering up into points.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Volume (V) = (1/3) · π · r² · h</p>
+                            <p class="equation">Surface Area (SA) = π · r · (r + √(h² + r²))</p>
                         </div>
-                        <div class="input-group">
-                            <label class="input-label">Height (h)</label>
-                            <input type="number" id="input-cone-h" class="text-input" placeholder="Height..." oninput="calcCone()">
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Base Radius (r)</label>
+                                    <input type="number" id="input-cone-r" class="text-input" placeholder="Radius..." oninput="calcCone()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height (h)</label>
+                                    <input type="number" id="input-cone-h" class="text-input" placeholder="Height..." oninput="calcCone()">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="result-container">
-                        <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-cone-v" class="result-value">0.0000</span></div>
-                        <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-cone-sa" class="result-value">0.0000</span></div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-cone"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-cone-v" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-cone-sa" class="result-value">0.0000</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-pyramid" class="page">
+                <div class="card">
+                    <div class="panel-left">
+                        <h2>Triangular Pyramid</h2>
+                        <p class="description">Calculate metrics for regular regular tetrahedrons with uniform equilateral bases.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Volume (V) = (1/3) · BaseArea · h</p>
+                            <p class="equation">BaseArea (BA) = (√3 / 4) · s²</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Base Edge (s)</label>
+                                    <input type="number" id="input-pyr-s" class="text-input" placeholder="Edge..." oninput="calcPyramid()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height (h)</label>
+                                    <input type="number" id="input-pyr-h" class="text-input" placeholder="Height..." oninput="calcPyramid()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-pyramid"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-pyr-v" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Base Area (BA)</span><span id="res-pyr-ba" class="result-value">0.0000</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-torus" class="page">
+                <div class="card">
+                    <div class="panel-left">
+                        <h2>Torus / Donut Solid</h2>
+                        <p class="description">Measure full hollow rings by sweeping small tube tracks around larger hub circles.</p>
+                        <div class="formula-box">
+                            <span class="title">Learning Formulas</span>
+                            <p class="equation">Volume (V) = 2 · π² · R · r²</p>
+                            <p class="equation">Surface Area (SA) = 4 · π² · R · r</p>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="inputs-grid">
+                                <div class="input-group">
+                                    <label class="input-label">Major Radius (R)</label>
+                                    <input type="number" id="input-tor-R" class="text-input" placeholder="Center distance..." oninput="calcTorus()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Tube Radius (r)</label>
+                                    <input type="number" id="input-tor-r" class="text-input" placeholder="Ring tube thickness..." oninput="calcTorus()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-right">
+                        <div class="preview-container">
+                            <span class="preview-label">Preview</span>
+                            <canvas id="canvas-torus"></canvas>
+                        </div>
+                        <div class="result-container">
+                            <div class="result-item"><span class="result-label">Volume (V)</span><span id="res-tor-v" class="result-value">0.0000</span></div>
+                            <div class="result-item result-divider"><span class="result-label">Surface Area (SA)</span><span id="res-tor-sa" class="result-value">0.0000</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -831,146 +1040,729 @@ inset 0 1px 1px rgba(255,255,255,.8);
     </div>
 
     <script>
+        const CanvasEngine = {
+            initAll() {
+                document.querySelectorAll('canvas').forEach(canvas => {
+                    const container = canvas.parentElement;
+                    canvas.width = container.clientWidth * window.devicePixelRatio;
+                    canvas.height = container.clientHeight * window.devicePixelRatio;
+                    const ctx = canvas.getContext('2d');
+                    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+                    this.drawPlaceholder(canvas.id);
+                });
+            },
+            
+            getClearCtx(canvasId) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return null;
+                const ctx = canvas.getContext('2d');
+                const w = canvas.width / window.devicePixelRatio;
+                const h = canvas.height / window.devicePixelRatio;
+                ctx.clearRect(0, 0, w, h);
+                return { ctx, w, h };
+            },
+
+            drawPlaceholder(canvasId) {
+                const res = this.getClearCtx(canvasId);
+                if (!res) return;
+                const { ctx, w, h } = res;
+                ctx.font = "600 13px 'Plus Jakarta Sans'";
+                ctx.fillStyle = "#79747E";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("Please enter values to preview", w / 2, h / 2);
+            },
+
+            drawLabel(ctx, text, x, y) {
+                ctx.save();
+                ctx.font = "700 11px monospace";
+                const padX = 8, padY = 4;
+                const tw = ctx.measureText(text).width;
+                const th = 11;
+                const tx = x - tw / 2;
+                
+                ctx.shadowColor = "rgba(0, 0, 0, 0.06)";
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetY = 4;
+                
+                ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+                ctx.beginPath();
+                ctx.roundRect(tx - padX, y - th / 2 - padY, tw + padX * 2, th + padY * 2, 6);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.strokeStyle = "rgba(103, 80, 164, 0.25)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                ctx.fillStyle = "#6750A4";
+                ctx.textAlign = "left";
+                ctx.textBaseline = "middle";
+                ctx.fillText(text, tx, y);
+                ctx.restore();
+            },
+
+            applyModernStyle(ctx, w, h, fillType = "linear", customGradient = null) {
+                ctx.lineWidth = 2.5;
+                ctx.lineJoin = "round";
+                ctx.lineCap = "round";
+                ctx.strokeStyle = "#4F378B";
+                
+                if (customGradient) {
+                    ctx.fillStyle = customGradient;
+                    return;
+                }
+                
+                if (fillType === "linear") {
+                    const grad = ctx.createLinearGradient(0, 0, w, h);
+                    grad.addColorStop(0, "rgba(103, 80, 164, 0.22)");
+                    grad.addColorStop(1, "rgba(142, 116, 219, 0.05)");
+                    ctx.fillStyle = grad;
+                } else {
+                    const grad = ctx.createRadialGradient(w/2, h/2, 5, w/2, h/2, Math.max(w, h));
+                    grad.addColorStop(0, "rgba(103, 80, 164, 0.25)");
+                    grad.addColorStop(1, "rgba(142, 116, 219, 0.02)");
+                    ctx.fillStyle = grad;
+                }
+            },
+
+            applyAxisStyle(ctx) {
+                ctx.strokeStyle = "#D0BCFF";
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+            },
+
+            applySolidBackStyle(ctx) {
+                ctx.strokeStyle = "rgba(103, 80, 164, 0.3)";
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([3, 4]);
+            },
+
+            resetStroke(ctx) {
+                ctx.setLineDash([]);
+            },
+
+            renderCircle(canvasId, val) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !val || val <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                const r = Math.min(w, h) * 0.36;
+                
+                this.applyModernStyle(ctx, w, h, "radial");
+                ctx.beginPath();
+                ctx.arc(w/2, h/2, r, 0, Math.PI*2);
+                ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2, h/2); ctx.lineTo(w/2 + r, h/2); ctx.stroke();
+                ctx.restore();
+                
+                ctx.beginPath();
+                ctx.fillStyle = "#4F378B";
+                ctx.arc(w/2, h/2, 4, 0, Math.PI*2);
+                ctx.fill();
+                
+                this.drawLabel(ctx, `r=${val.toFixed(1)}`, w/2 + r/2, h/2 - 14);
+            },
+
+            renderSquare(canvasId, val) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !val || val <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                const side = Math.min(w, h) * 0.62;
+                const x = w/2 - side/2, y = h/2 - side/2;
+                
+                this.applyModernStyle(ctx, w, h, "linear");
+                ctx.beginPath();
+                ctx.roundRect(x, y, side, side, 4);
+                ctx.fill(); ctx.stroke();
+                
+                this.drawLabel(ctx, `s=${val.toFixed(1)}`, w/2, y - 14);
+                this.drawLabel(ctx, `s=${val.toFixed(1)}`, x - 26, h/2);
+            },
+
+            renderRectangle(canvasId, l, wDim) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !l || !wDim || l <= 0 || wDim <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.72, maxH = h * 0.72;
+                const ratio = l / wDim;
+                let rectW = maxW, rectH = maxW / ratio;
+                if (rectH > maxH) { rectH = maxH; rectW = maxH * ratio; }
+                
+                const x = w/2 - rectW/2, y = h/2 - rectH/2;
+                this.applyModernStyle(ctx, w, h, "linear");
+                ctx.beginPath();
+                ctx.roundRect(x, y, rectW, rectH, 4);
+                ctx.fill(); ctx.stroke();
+                
+                this.drawLabel(ctx, `l=${l.toFixed(1)}`, w/2, y - 14);
+                this.drawLabel(ctx, `w=${wDim.toFixed(1)}`, x - 26, h/2);
+            },
+
+            renderTriangle(canvasId, b, height) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !b || !height || b <= 0 || height <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.72, maxH = h * 0.72;
+                const ratio = b / height;
+                let triW = maxW, triH = maxW / ratio;
+                if (triH > maxH) { triH = maxH; triW = maxH * ratio; }
+                
+                const bx = w/2 - triW/2, by = h/2 + triH/2;
+                this.applyModernStyle(ctx, w, h, "linear");
+                ctx.beginPath();
+                ctx.moveTo(bx, by);
+                ctx.lineTo(bx + triW, by);
+                ctx.lineTo(w/2, h/2 - triH/2);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2, h/2 - triH/2); ctx.lineTo(w/2, by); ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `b=${b.toFixed(1)}`, w/2, by + 16);
+                this.drawLabel(ctx, `h=${height.toFixed(1)}`, w/2 + 24, h/2);
+            },
+
+            renderParallelogram(canvasId, b, height) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !b || !height || b <= 0 || height <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.65, maxH = h * 0.65;
+                const ratio = b / height;
+                let pW = maxW, pH = maxW / ratio;
+                if (pH > maxH) { pH = maxH; pW = maxH * ratio; }
+                
+                const skew = pH * 0.4;
+                if (pW + skew > w * 0.85) {
+                    const norm = (w * 0.85) / (pW + skew);
+                    pW *= norm; pH *= norm;
+                }
+                
+                const x1 = w/2 - pW/2 - skew/2, y1 = h/2 - pH/2;
+                const y2 = h/2 + pH/2;
+                
+                this.applyModernStyle(ctx, w, h, "linear");
+                ctx.beginPath();
+                ctx.moveTo(x1 + skew, y1);
+                ctx.lineTo(x1 + skew + pW, y1);
+                ctx.lineTo(x1 + pW, y2);
+                ctx.lineTo(x1, y2);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(x1 + skew, y1); ctx.lineTo(x1 + skew, y2); ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `b=${b.toFixed(1)}`, w/2, y2 + 16);
+                this.drawLabel(ctx, `h=${height.toFixed(1)}`, x1 + skew + 24, h/2);
+            },
+
+            renderTrapezoid(canvasId, top, bottom, height) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !top || !bottom || !height || top<=0 || bottom<=0 || height<=0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.72, maxH = h * 0.68;
+                const maxBase = Math.max(top, bottom);
+                const scale = Math.min(maxW / maxBase, maxH / height);
+                
+                const tW = top * scale, bW = bottom * scale, tH = height * scale;
+                const y1 = h/2 - tH/2, y2 = h/2 + tH/2;
+                
+                this.applyModernStyle(ctx, w, h, "linear");
+                ctx.beginPath();
+                ctx.moveTo(w/2 - tW/2, y1);
+                ctx.lineTo(w/2 + tW/2, y1);
+                ctx.lineTo(w/2 + bW/2, y2);
+                ctx.lineTo(w/2 - bW/2, y2);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2 - tW/2, y1); ctx.lineTo(w/2 - tW/2, y2); ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `a=${top.toFixed(1)}`, w/2, y1 - 14);
+                this.drawLabel(ctx, `b=${bottom.toFixed(1)}`, w/2, y2 + 16);
+                this.drawLabel(ctx, `h=${height.toFixed(1)}`, w/2 - tW/2 + 24, h/2);
+            },
+
+            renderHexagon(canvasId, val) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !val || val <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                const r = Math.min(w, h) * 0.38;
+                
+                this.applyModernStyle(ctx, w, h, "radial");
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI) / 3;
+                    const x = w / 2 + r * Math.cos(angle);
+                    const y = h / 2 + r * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                
+                const edgeMidX = w/2 + r * Math.cos(Math.PI/6) * 1.08;
+                const edgeMidY = h/2;
+                this.drawLabel(ctx, `s=${val.toFixed(1)}`, edgeMidX + 10, edgeMidY);
+            },
+
+            renderEllipse(canvasId, a, b) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !a || !b || a <= 0 || b <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.72, maxH = h * 0.72;
+                const ratio = a / b;
+                let ellA = maxW / 2, ellB = (maxW / ratio) / 2;
+                if (ellB * 2 > maxH) { ellB = maxH / 2; ellA = (maxH * ratio) / 2; }
+                
+                this.applyModernStyle(ctx, w, h, "radial");
+                ctx.beginPath();
+                ctx.ellipse(w/2, h/2, ellA, ellB, 0, 0, Math.PI*2);
+                ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2, h/2); ctx.lineTo(w/2 + ellA, h/2);
+                ctx.moveTo(w/2, h/2); ctx.lineTo(w/2, h/2 - ellB);
+                ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `a=${a.toFixed(1)}`, w/2 + ellA/2, h/2 + 14);
+                this.drawLabel(ctx, `b=${b.toFixed(1)}`, w/2 - 26, h/2 - ellB/2);
+            },
+
+            renderCube(canvasId, val) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !val || val <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                const size = Math.min(w, h) * 0.48;
+                const off = size * 0.35;
+                
+                const x1 = w/2 - size/2 - off/2, y1 = h/2 - size/2 + off/2;
+                const x2 = x1 + off, y2 = y1 - off;
+                
+                ctx.save();
+                this.applySolidBackStyle(ctx);
+                ctx.beginPath();
+                ctx.rect(x2, y2, size, size);
+                ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(x1, y1 + size); ctx.lineTo(x2, y2 + size); ctx.stroke();
+                ctx.restore();
+                
+                const faceGrad = ctx.createLinearGradient(x1, y1, x1+size, y1+size);
+                faceGrad.addColorStop(0, "rgba(103, 80, 164, 0.25)");
+                faceGrad.addColorStop(1, "rgba(142, 116, 219, 0.08)");
+                this.applyModernStyle(ctx, w, h, "linear", faceGrad);
+                
+                ctx.beginPath();
+                ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+                ctx.lineTo(x2 + size, y2); ctx.lineTo(x1 + size, y1);
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(x1 + size, y1); ctx.lineTo(x2 + size, y2);
+                ctx.lineTo(x2 + size, y2 + size); ctx.lineTo(x1 + size, y1 + size);
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.rect(x1, y1, size, size);
+                ctx.fill(); ctx.stroke();
+                
+                this.drawLabel(ctx, `s=${val.toFixed(1)}`, x1 + size/2, y1 + size + 16);
+            },
+
+            renderSphere(canvasId, val) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !val || val <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                const rad = Math.min(w, h) * 0.38;
+                
+                const sphereGrad = ctx.createRadialGradient(w/2 - rad/3, h/2 - rad/3, rad/8, w/2, h/2, rad);
+                sphereGrad.addColorStop(0, "rgba(168, 143, 235, 0.35)");
+                sphereGrad.addColorStop(0.6, "rgba(103, 80, 164, 0.18)");
+                sphereGrad.addColorStop(1, "rgba(67, 40, 122, 0.05)");
+                
+                this.applyModernStyle(ctx, w, h, "radial", sphereGrad);
+                ctx.beginPath(); ctx.arc(w/2, h/2, rad, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applySolidBackStyle(ctx);
+                ctx.beginPath(); ctx.ellipse(w/2, h/2, rad, rad * 0.25, 0, Math.PI, Math.PI*2); ctx.stroke();
+                ctx.restore();
+                
+                ctx.save();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = "#8E74DB";
+                ctx.beginPath(); ctx.ellipse(w/2, h/2, rad, rad * 0.25, 0, 0, Math.PI); ctx.stroke();
+                ctx.restore();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2, h/2); ctx.lineTo(w/2 + rad * Math.cos(Math.PI/4), h/2 - rad * Math.sin(Math.PI/4)); ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `r=${val.toFixed(1)}`, w/2 + rad/3, h/2 - rad/3);
+            },
+
+            renderCylinder(canvasId, r, hDim) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !r || !hDim || r <= 0 || hDim <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.6, maxH = h * 0.62;
+                const ratio = (r * 2) / hDim;
+                let cylW = maxW, cylH = maxH;
+                if (cylW / ratio > maxH) { cylH = maxH; cylW = maxH * ratio; } else { cylH = cylW / ratio; }
+                
+                const rx = cylW / 2, ry = rx * 0.28;
+                const ty = h/2 - cylH/2, by = h/2 + cylH/2;
+                
+                const cylGrad = ctx.createLinearGradient(w/2 - rx, 0, w/2 + rx, 0);
+                cylGrad.addColorStop(0, "rgba(103, 80, 164, 0.25)");
+                cylGrad.addColorStop(0.3, "rgba(168, 143, 235, 0.15)");
+                cylGrad.addColorStop(0.9, "rgba(103, 80, 164, 0.05)");
+                this.applyModernStyle(ctx, w, h, "linear", cylGrad);
+                
+                ctx.beginPath();
+                ctx.rect(w/2 - rx, ty, cylW, cylH);
+                ctx.fill();
+                
+                ctx.save();
+                this.applySolidBackStyle(ctx);
+                ctx.beginPath(); ctx.ellipse(w/2, by, rx, ry, 0, Math.PI, Math.PI*2); ctx.stroke();
+                ctx.restore();
+                
+                ctx.beginPath();
+                ctx.moveTo(w/2 - rx, ty); ctx.lineTo(w/2 - rx, by);
+                ctx.moveTo(w/2 + rx, ty); ctx.lineTo(w/2 + rx, by);
+                ctx.stroke();
+                
+                this.applyModernStyle(ctx, w, h, "linear", "rgba(142, 116, 219, 0.2)");
+                ctx.beginPath(); ctx.ellipse(w/2, ty, rx, ry, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2 + rx, ty); ctx.lineTo(w/2 + rx, by); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(w/2, ty); ctx.lineTo(w/2 + rx, ty); ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `r=${r.toFixed(1)}`, w/2 + rx/2, ty - 12);
+                this.drawLabel(ctx, `h=${hDim.toFixed(1)}`, w/2 + rx + 26, h/2);
+            },
+
+            renderCone(canvasId, r, hDim) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !r || !hDim || r <= 0 || hDim <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.6, maxH = h * 0.62;
+                const ratio = (r * 2) / hDim;
+                let coneW = maxW, coneH = maxH;
+                if (coneW / ratio > maxH) { coneH = maxH; coneW = maxH * ratio; } else { coneH = coneW / ratio; }
+                
+                const rx = coneW / 2, ry = rx * 0.28;
+                const ty = h/2 - coneH/2, by = h/2 + coneH/2;
+                
+                const coneGrad = ctx.createLinearGradient(w/2 - rx, 0, w/2 + rx, 0);
+                coneGrad.addColorStop(0, "rgba(103, 80, 164, 0.25)");
+                coneGrad.addColorStop(0.7, "rgba(142, 116, 219, 0.08)");
+                this.applyModernStyle(ctx, w, h, "linear", coneGrad);
+                
+                ctx.beginPath();
+                ctx.moveTo(w/2 - rx, by); ctx.lineTo(w/2, ty); ctx.lineTo(w/2 + rx, by);
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applySolidBackStyle(ctx);
+                ctx.beginPath(); ctx.ellipse(w/2, by, rx, ry, 0, Math.PI, Math.PI*2); ctx.stroke();
+                ctx.restore();
+                
+                ctx.save();
+                ctx.strokeStyle = "#4F378B"; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+                ctx.beginPath(); ctx.ellipse(w/2, by, rx, ry, 0, 0, Math.PI); ctx.stroke();
+                ctx.restore();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2, ty); ctx.lineTo(w/2, by);
+                ctx.moveTo(w/2, by); ctx.lineTo(w/2 + rx, by);
+                ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `r=${r.toFixed(1)}`, w/2 + rx/2, by + 14);
+                this.drawLabel(ctx, `h=${hDim.toFixed(1)}`, w/2 - 20, h/2);
+            },
+
+            renderPyramid(canvasId, s, hDim) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !s || !hDim || s <= 0 || hDim <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.6, maxH = h * 0.62;
+                const baseProjectedHeight = s * Math.sin(Math.PI/3) * 0.5;
+                const ratio = s / (hDim + baseProjectedHeight);
+                
+                let pyrScale = maxW / s;
+                if (pyrScale * (hDim + baseProjectedHeight) > maxH) {
+                    pyrScale = maxH / (hDim + baseProjectedHeight);
+                }
+                
+                const realS = s * pyrScale;
+                const realH = hDim * pyrScale;
+                const projH = baseProjectedHeight * pyrScale;
+                
+                const topX = w/2, topY = h/2 - realH/2 - projH/4;
+                const centerY = topY + realH;
+                
+                const b1X = w/2 - realS/2, b1Y = centerY + projH/2;
+                const b2X = w/2 + realS/2, b2Y = centerY + projH/2;
+                const b3X = w/2, b3Y = centerY - projH;
+                
+                ctx.save();
+                this.applySolidBackStyle(ctx);
+                ctx.beginPath();
+                ctx.moveTo(b1X, b1Y); ctx.lineTo(b3X, b3Y); ctx.lineTo(b2X, b2Y);
+                ctx.moveTo(topX, topY); ctx.lineTo(b3X, b3Y);
+                ctx.stroke();
+                ctx.restore();
+                
+                const pyrGrad = ctx.createLinearGradient(b1X, topY, b2X, b2Y);
+                pyrGrad.addColorStop(0, "rgba(103, 80, 164, 0.28)");
+                pyrGrad.addColorStop(1, "rgba(142, 116, 219, 0.05)");
+                this.applyModernStyle(ctx, w, h, "linear", pyrGrad);
+                
+                ctx.beginPath();
+                ctx.moveTo(b1X, b1Y); ctx.lineTo(b2X, b2Y); ctx.lineTo(topX, topY); ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(topX, topY); ctx.lineTo(w/2, centerY); ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `s=${s.toFixed(1)}`, (b1X+b2X)/2, b1Y + 16);
+                this.drawLabel(ctx, `h=${hDim.toFixed(1)}`, topX - 24, topY + realH/2);
+            },
+
+            renderTorus(canvasId, R, r) {
+                const res = this.getClearCtx(canvasId);
+                if (!res || !R || !r || R <= 0 || r <= 0) { this.drawPlaceholder(canvasId); return; }
+                const { ctx, w, h } = res;
+                
+                const maxW = w * 0.72, maxH = h * 0.65;
+                const totalR = R + r;
+                const viewScale = Math.min(maxW / (totalR * 2), maxH / (totalR * 2 * 0.45));
+                
+                const viewR = R * viewScale;
+                const viewInnerr = r * viewScale;
+                
+                const torusGrad = ctx.createRadialGradient(w/2, h/2, viewR - viewInnerr, w/2, h/2, viewR + viewInnerr);
+                torusGrad.addColorStop(0, "rgba(103, 80, 164, 0.1)");
+                torusGrad.addColorStop(0.5, "rgba(168, 143, 235, 0.3)");
+                torusGrad.addColorStop(1, "rgba(67, 40, 122, 0.15)");
+                this.applyModernStyle(ctx, w, h, "radial", torusGrad);
+                
+                ctx.beginPath();
+                ctx.ellipse(w/2, h/2, viewR + viewInnerr, (viewR + viewInnerr)*0.45, 0, 0, Math.PI*2);
+                ctx.fill(); ctx.stroke();
+                
+                ctx.save();
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.beginPath();
+                ctx.ellipse(w/2, h/2, viewR - viewInnerr, (viewR - viewInnerr)*0.45, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.restore();
+                
+                ctx.beginPath();
+                ctx.ellipse(w/2, h/2, viewR - viewInnerr, (viewR - viewInnerr)*0.45, 0, 0, Math.PI*2);
+                ctx.stroke();
+                
+                ctx.save();
+                this.applyAxisStyle(ctx);
+                ctx.beginPath(); ctx.moveTo(w/2, h/2); ctx.lineTo(w/2 + viewR, h/2); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(w/2 + viewR, h/2, viewInnerr, viewInnerr * 0.45, 0, 0, Math.PI*2); ctx.stroke();
+                ctx.restore();
+                
+                this.drawLabel(ctx, `R=${R.toFixed(1)}`, w/2 + viewR/2, h/2 + 14);
+                this.drawLabel(ctx, `r=${r.toFixed(1)}`, w/2 + viewR + viewInnerr + 12, h/2);
+            }
+        };
+
         function switchTab(tabId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-            
             document.getElementById(tabId).classList.add('active');
             
-            const clickedBtn = Array.from(document.querySelectorAll('.nav-button'))
-                                    .find(btn => btn.getAttribute('onclick').includes(tabId));
+            const clickedBtn = Array.from(document.querySelectorAll('.nav-button')).find(btn => btn.getAttribute('onclick').includes(tabId));
             if (clickedBtn) clickedBtn.classList.add('active');
+            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 60);
         }
 
         function format(value){
-            if(!Number.isFinite(value)){
-                return "0.0000";
-            }
-            return value.toFixed(4);
+            return (!Number.isFinite(value) || isNaN(value)) ? "0.0000" : value.toFixed(4);
         }
 
         function calcRadius() {
             const r = parseFloat(document.getElementById('input-radius').value);
             document.getElementById('res-c-from-r').innerText = format(2 * Math.PI * r);
             document.getElementById('res-a-from-r').innerText = format(Math.PI * r * r);
+            CanvasEngine.renderCircle('canvas-radius', r);
         }
-
         function calcDiameter() {
             const d = parseFloat(document.getElementById('input-diameter').value);
             document.getElementById('res-c-from-d').innerText = format(Math.PI * d);
             document.getElementById('res-a-from-d').innerText = format(Math.PI * Math.pow(d / 2, 2));
+            CanvasEngine.renderCircle('canvas-diameter', d / 2);
         }
-
         function calcInverse() {
             const c = parseFloat(document.getElementById('input-circumference').value);
             const r = c / (2 * Math.PI);
-            const d = c / Math.PI;
-            const a = Math.PI * r * r;
-            document.getElementById('res-d-from-c').innerText = format(d);
+            document.getElementById('res-d-from-c').innerText = format(c / Math.PI);
             document.getElementById('res-r-from-c').innerText = format(r);
-            document.getElementById('res-a-from-c').innerText = format(a);
+            document.getElementById('res-a-from-c').innerText = format(Math.PI * r * r);
+            CanvasEngine.renderCircle('canvas-inverse', r);
         }
-
         function calcAreaDecoder() {
             const a = parseFloat(document.getElementById('input-area-decode').value);
             const r = Math.sqrt(a / Math.PI);
             document.getElementById('res-r-from-a').innerText = format(r);
             document.getElementById('res-d-from-a').innerText = format(2 * r);
             document.getElementById('res-c-from-a').innerText = format(2 * Math.PI * r);
+            CanvasEngine.renderCircle('canvas-area-decoder', r);
         }
-
         function calcSquare() {
             const s = parseFloat(document.getElementById('input-square-s').value);
             document.getElementById('res-square-a').innerText = format(s * s);
             document.getElementById('res-square-p').innerText = format(4 * s);
+            CanvasEngine.renderSquare('canvas-square', s);
         }
-
         function calcRectangle() {
             const l = parseFloat(document.getElementById('input-rect-l').value);
             const w = parseFloat(document.getElementById('input-rect-w').value);
             document.getElementById('res-rect-a').innerText = format(l * w);
             document.getElementById('res-rect-p').innerText = format(2 * (l + w));
+            CanvasEngine.renderRectangle('canvas-rectangle', l, w);
         }
-
         function calcTriangle() {
             const b = parseFloat(document.getElementById('input-tri-b').value);
             const h = parseFloat(document.getElementById('input-tri-h').value);
             document.getElementById('res-tri-a').innerText = format(0.5 * b * h);
+            CanvasEngine.renderTriangle('canvas-triangle', b, h);
         }
-
         function calcParallelogram() {
             const b = parseFloat(document.getElementById('input-para-b').value);
             const h = parseFloat(document.getElementById('input-para-h').value);
             document.getElementById('res-para-a').innerText = format(b * h);
+            CanvasEngine.renderParallelogram('canvas-parallelogram', b, h);
         }
-
         function calcTrapezoid() {
             const a = parseFloat(document.getElementById('input-trap-a').value);
             const b = parseFloat(document.getElementById('input-trap-b').value);
             const h = parseFloat(document.getElementById('input-trap-h').value);
             document.getElementById('res-trap-a').innerText = format(((a + b) * h) / 2);
+            CanvasEngine.renderTrapezoid('canvas-trapezoid', a, b, h);
         }
-
         function calcHexagon() {
             const s = parseFloat(document.getElementById('input-hex-s').value);
             document.getElementById('res-hex-a').innerText = format((3 * Math.sqrt(3) / 2) * s * s);
             document.getElementById('res-hex-p').innerText = format(6 * s);
+            CanvasEngine.renderHexagon('canvas-hexagon', s);
         }
-
         function calcEllipse() {
             const a = parseFloat(document.getElementById('input-ellipse-a').value);
             const b = parseFloat(document.getElementById('input-ellipse-b').value);
             document.getElementById('res-ellipse-a').innerText = format(Math.PI * a * b);
+            CanvasEngine.renderEllipse('canvas-ellipse', a, b);
         }
-
         function calcCube() {
             const s = parseFloat(document.getElementById('input-cube-s').value);
             document.getElementById('res-cube-v').innerText = format(Math.pow(s, 3));
             document.getElementById('res-cube-sa').innerText = format(6 * s * s);
+            CanvasEngine.renderCube('canvas-cube', s);
         }
-
         function calcSphere() {
             const r = parseFloat(document.getElementById('input-sphere-r').value);
             document.getElementById('res-sphere-v').innerText = format((4 / 3) * Math.PI * Math.pow(r, 3));
             document.getElementById('res-sphere-sa').innerText = format(4 * Math.PI * r * r);
+            CanvasEngine.renderSphere('canvas-sphere', r);
         }
-
         function calcCylinder() {
             const r = parseFloat(document.getElementById('input-cyl-r').value);
             const h = parseFloat(document.getElementById('input-cyl-h').value);
             document.getElementById('res-cyl-v').innerText = format(Math.PI * r * r * h);
             document.getElementById('res-cyl-sa').innerText = format((2 * Math.PI * r * h) + (2 * Math.PI * r * r));
+            CanvasEngine.renderCylinder('canvas-cylinder', r, h);
         }
-
         function calcCone() {
             const r = parseFloat(document.getElementById('input-cone-r').value);
             const h = parseFloat(document.getElementById('input-cone-h').value);
             const slantHeight = Math.sqrt(r * r + h * h);
             document.getElementById('res-cone-v').innerText = format((1 / 3) * Math.PI * r * r * h);
             document.getElementById('res-cone-sa').innerText = format(Math.PI * r * (r + slantHeight));
+            CanvasEngine.renderCone('canvas-cone', r, h);
         }
+        function calcPyramid() {
+            const s = parseFloat(document.getElementById('input-pyr-s').value);
+            const h = parseFloat(document.getElementById('input-pyr-h').value);
+            const baseArea = (Math.sqrt(3) / 4) * s * s;
+            document.getElementById('res-pyr-v').innerText = format((1 / 3) * baseArea * h);
+            document.getElementById('res-pyr-ba').innerText = format(baseArea);
+            CanvasEngine.renderPyramid('canvas-pyramid', s, h);
+        }
+        function calcTorus() {
+            const R = parseFloat(document.getElementById('input-tor-R').value);
+            const r = parseFloat(document.getElementById('input-tor-r').value);
+            document.getElementById('res-tor-v').innerText = format(2 * Math.PI * Math.PI * R * r * r);
+            document.getElementById('res-tor-sa').innerText = format(4 * Math.PI * Math.PI * R * r);
+            CanvasEngine.renderTorus('canvas-torus', R, r);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            CanvasEngine.initAll();
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.addEventListener('pointermove', (e) => {
+                const r = sidebar.getBoundingClientRect();
+                sidebar.style.setProperty('--blob-x', (e.clientX - r.left) + 'px');
+                sidebar.style.setProperty('--blob-y', (e.clientY - r.top) + 'px');
+            });
+
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const r = card.getBoundingClientRect();
+                    const x = (e.clientX - r.left - r.width / 2) / 30;
+                    const y = (e.clientY - r.top - r.height / 2) / 30;
+                    card.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+                });
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            CanvasEngine.initAll();
+            const activePage = document.querySelector('.page.active');
+            if (activePage) {
+                const inputs = activePage.querySelectorAll('input');
+                if (inputs.length > 0) inputs[0].dispatchEvent(new Event('input'));
+            }
+        });
     </script>
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-const sidebar=document.querySelector('.sidebar');
-
-sidebar.addEventListener('pointermove',(e)=>{
- const r=sidebar.getBoundingClientRect();
- sidebar.style.setProperty('--blob-x',(e.clientX-r.left)+'px');
- sidebar.style.setProperty('--blob-y',(e.clientY-r.top)+'px');
-});
-
-document.querySelectorAll('.card').forEach(card=>{
- card.addEventListener('mousemove',(e)=>{
-   const r=card.getBoundingClientRect();
-   const x=(e.clientX-r.left-r.width/2)/30;
-   const y=(e.clientY-r.top-r.height/2)/30;
-   card.style.transform=`rotateY(${x}deg) rotateX(${-y}deg)`;
- });
- card.addEventListener('mouseleave',()=>{
-   card.style.transform='rotateY(0deg) rotateX(0deg)';
- });
-});
-});
-</script></body>
+</body>
 </html>
